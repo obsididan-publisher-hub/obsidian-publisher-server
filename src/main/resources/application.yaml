@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: obsidian-publisher
+
+api:
+  base:
+    path: /api

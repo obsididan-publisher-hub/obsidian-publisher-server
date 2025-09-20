@@ -1,0 +1,126 @@
+openapi: 3.0.3
+info:
+  title: Obsidian Notes API
+  version: 1.0.0
+  description: API для работы с Obsidian заметками
+
+paths:
+  /notes/{id}:
+    get:
+      summary: Получить заметку по идентификатору
+      description: >
+        Идентификатор (`id`) вычисляется как **MD5-хеш** от полного пути заметки внутри Obsidian-хранилища.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "5d41402abc4b2a76b9719d911017c592"
+          description: MD5-хеш полного пути к заметке
+      responses:
+        "200":
+          description: Заметка успешно получена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+              examples:
+                sample:
+                  summary: Пример заметки
+                  value:
+                    id: "5d41402abc4b2a76b9719d911017c592"
+                    path: "Projects/Obsidian/ExampleNote.md"
+                    title: "ExampleNote"
+                    fields:
+                      - name: "createdAt"
+                        type: "date"
+                        value: "2025-09-20T12:34:56Z"
+                      - name: "tags"
+                        type: "list"
+                        value: [ "obsidian", "api" ]
+                      - name: "priority"
+                        type: "number"
+                        value: 3
+                    content: |
+                      # Заголовок
+                      Текст заметки с **Markdown** форматированием.
+        "404":
+          description: Заметка не найдена
+
+  /tags:
+    get:
+      summary: Получить все теги
+      description: Вернуть список всех тегов, присутствующих в хранилище Obsidian.
+      responses:
+        "200":
+          description: Список тегов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "obsidian"
+              examples:
+                sample:
+                  summary: Пример списка тегов
+                  value: [ "obsidian", "api", "note" ]
+
+components:
+  schemas:
+    NoteField:
+      type: object
+      description: Поле заметки
+      properties:
+        name:
+          type: string
+          description: Название поля
+          example: "createdAt"
+        type:
+          type: string
+          enum: [ string, number, boolean, date, list ]
+          description: Тип значения поля
+          example: "date"
+        value:
+          description: Значение поля (тип зависит от поля)
+          oneOf:
+            - type: string
+              example: "Задача"
+            - type: number
+              example: 42
+            - type: boolean
+              example: true
+            - type: string
+              format: date-time
+              example: "2025-09-20T12:34:56Z"
+            - type: array
+              items:
+                type: string
+              example: [ "tag1", "tag2" ]
+
+    Note:
+      type: object
+      description: Заметка Obsidian
+      properties:
+        id:
+          type: string
+          description: MD5-хеш полного пути заметки
+          example: "5d41402abc4b2a76b9719d911017c592"
+        path:
+          type: string
+          description: Полный путь к заметке в хранилище
+          example: "Projects/Obsidian/ExampleNote.md"
+        title:
+          type: string
+          description: Название заметки (без расширения)
+          example: "ExampleNote"
+        fields:
+          type: array
+          description: Список полей заметки
+          items:
+            $ref: "#/components/schemas/NoteField"
+        content:
+          type: string
+          description: Markdown-содержимое заметки
+          example: "# Заголовок\nТекст заметки..."
