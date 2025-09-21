@@ -1,0 +1,199 @@
+{
+  "main": {
+    "id": "257dd49a7932ee07",
+    "type": "split",
+    "children": [
+      {
+        "id": "94f482e6d8a2dd6b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "df63672337ccc8d1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "cycleNote1.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "cycleNote1"
+            }
+          }
+        ]
+      },
+      {
+        "id": "8612681cb25a0d81",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4c1c85c6d29dec5b",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "55c5fd7d921e6310",
+    "type": "split",
+    "children": [
+      {
+        "id": "2757dd9a2643a5d3",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9d562bee676384be",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "d167679af4a6ecf2",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "0d8c7126c3965fb0",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "0d4f4a51d7693ef6",
+    "type": "split",
+    "children": [
+      {
+        "id": "de0fd4a2dc61a476",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ccdf2597b0be138f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "cycleNote1.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for cycleNote1"
+            }
+          },
+          {
+            "id": "35e35323546e4b4a",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "cycleNote1.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from cycleNote1"
+            }
+          },
+          {
+            "id": "585746967d59e825",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "6c58944328296468",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "cycleNote1.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of cycleNote1"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "df63672337ccc8d1",
+  "lastOpenFiles": [
+    "cycleNote2.md",
+    "cycleNote1.md",
+    "note2.md",
+    "note1.md",
+    "orphanNote.md",
+    "selfLinkingNote.md",
+    "cycleNote3.md",
+    "Welcome.md"
+  ]
+}

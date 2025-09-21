@@ -22,14 +22,15 @@ class GraphBuilder(private val vaultPath: String) {
         val graph = HashMap<String, Note>()
         val root = File(vaultPath)
         require(root.exists()) { "vault directory $vaultPath is not exist" }
-
+        logger.info("Start processing vault $vaultPath")
         root.walkTopDown()
             .onEnter { !it.isHidden } // Не заходим в скрытые директории
             .filter { it.isFile && it.extension == NOTE_EXTENSION } // Оставляем только md-файлы
             .forEach { file ->
                 try {
-                    val noteId = NoteUtils.calculateNoteId(file.relativeTo(root).path)
                     val fullName = file.relativeTo(root).path
+                    logger.info("processing $fullName")
+                    val noteId = NoteUtils.calculateNoteId(fullName.substringBeforeLast('.'))
 
                     val extractedLinks: Set<NoteLink> = NoteUtils.extractLinks(file.readText())
                         .associateBy { it.path }
@@ -58,7 +59,7 @@ class GraphBuilder(private val vaultPath: String) {
                 graph[targetId]?.incomingNotes?.add(note.id)
             }
         }
-
+        logger.info("Vault processing ended. ${graph.size} notes totally processed")
         return graph
     }
 }

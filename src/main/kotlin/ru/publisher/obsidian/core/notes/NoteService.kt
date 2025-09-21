@@ -1,7 +1,7 @@
 package ru.publisher.obsidian.core.notes
 
 /**
- * Сервис предоставляющий доступ к сохраненным заметка obsidian хранилища
+ * Сервис предоставляющий доступ к графу заметок obsidian и описанию заметки
  */
 interface NoteService {
     /**

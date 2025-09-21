@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Configuration
  */
 @Configuration
 class NoteServiceConfiguration(
-    @field:Value("\${obsidian.vault.path}")
-    private val vaultPath: String,
+    @Value("\${obsidian.vault.path}")
+    private val vaultPath: String
 ) {
     private val logger: Logger = LoggerFactory.getLogger(NoteServiceConfiguration::class.java)
 

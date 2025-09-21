@@ -3,3 +3,8 @@
 ```editorconfig
 obsidian.vault.path
 ```
+
+```editorconfig
+GET {stand_url}/actuator/metrics
+```
+

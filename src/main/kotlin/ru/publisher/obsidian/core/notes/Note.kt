@@ -12,8 +12,8 @@ package ru.publisher.obsidian.core.notes
  * @since 2025.09.20
  */
 data class Note(
-    var id: String,
-    var fullName: String,
-    var outgoingNotes: MutableSet<String>,
-    var incomingNotes: MutableSet<String>
+    val id: String,
+    val fullName: String,
+    val outgoingNotes: MutableSet<String>,
+    val incomingNotes: MutableSet<String>
 )

@@ -11,12 +11,17 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import ru.publisher.obsidian.core.contents.NoteContentService
+import ru.publisher.obsidian.core.notes.NoteService
 import ru.publisher.obsidian.dto.Note
 
 @RestController
 @Validated
 @RequestMapping("\${api.base.path}")
-class NotesApiController() {
+class NotesApiController(
+    private val notesService: NoteService,
+    private val contentService: NoteContentService
+) {
 
     @Operation(
         summary = "Получить заметку по идентификатору",
@@ -40,6 +45,8 @@ class NotesApiController() {
             required = true
         ) @PathVariable("id") id: String
     ): ResponseEntity<Note> {
-        return ResponseEntity.ok(Note("123", "123", "123", listOf(), "123"));
+        val note: ru.publisher.obsidian.core.notes.Note = notesService.getNoteById(id)
+        val noteFullContent = contentService.getFullContent(note)
+        return ResponseEntity.ok(Note(note.id, note.fullName, note.fullName, listOf(), noteFullContent));
     }
 }
