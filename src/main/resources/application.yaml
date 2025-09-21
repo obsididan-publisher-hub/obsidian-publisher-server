@@ -5,3 +5,8 @@ spring:
 api:
   base:
     path: /api
+
+
+obsidian:
+  vault:
+    path: content
