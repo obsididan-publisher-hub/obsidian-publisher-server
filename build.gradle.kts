@@ -20,15 +20,17 @@ repositories {
     mavenCentral()
 }
 
-extra["springdoc-openapi-starter-webmvc-ui"] = "2.8.13"
+val springdocVersion = "2.8.13"
+val jacksonYamlVersion = "2.20.0"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${property("springdoc-openapi-starter-webmvc-ui")}")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonYamlVersion")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -49,9 +51,9 @@ openApiGenerate {
     inputSpec.set("$rootDir/src/main/resources/openapi/obsidian-publisher.yaml")
     apiPackage.set("ru.publisher.obsidian.api")
     modelPackage.set("ru.publisher.obsidian.api.dto")
-    configOptions.put("interfaceOnly", "false")  // генерируем классы, а не только интерфейсы
-    configOptions.put("delegatePattern", "false") // генерируем @RestController напрямую
-    configOptions.put("useSpringBoot3", "true")   // для Spring Boot 3
+    configOptions.put("interfaceOnly", "false")
+    configOptions.put("delegatePattern", "false")
+    configOptions.put("useSpringBoot3", "true")
 }
 
 sourceSets {
