@@ -8,7 +8,7 @@ import ru.publisher.obsidian.core.notes.Note
 interface NoteContentService {
 
     /**
-     * Содержимое заметки (как содержимое файла), включая frontmatter
+     * @return содержимое заметки
      */
-    fun getFullContent(note: Note): String
+    fun getContent(note: Note): NoteContent
 }

@@ -1,0 +1,15 @@
+{
+  "types": {
+    "aliases": "aliases",
+    "cssclasses": "multitext",
+    "tags": "tags",
+    "string_field": "text",
+    "number_field": "number",
+    "boolean_field": "checkbox",
+    "list_field": "multitext",
+    "date_field": "date",
+    "number_field_int": "number",
+    "boolean_field_false": "checkbox",
+    "boolean_field_false_null": "checkbox"
+  }
+}
