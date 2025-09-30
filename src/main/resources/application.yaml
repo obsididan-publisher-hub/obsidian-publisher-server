@@ -5,3 +5,13 @@ spring:
 api:
   base:
     path: /api
+
+obsidian:
+  vault:
+    path: /home/fenya/obsidian/obsidian
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
