@@ -1,9 +1,8 @@
-package ru.publisher.obsidian.model
+package ru.publisher.obsidian.dto
 
 /**
  * Значение поля (тип зависит от поля)
  */
-class NoteFieldValue(
+class NoteFieldValueDto(
 
 )
-

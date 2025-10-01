@@ -10,9 +10,9 @@ import jakarta.validation.Valid
  * Поле заметки
  * @param name Название поля
  * @param type Тип значения поля
- * @param &#x60;value&#x60;
+ * @param value значение поля
  */
-data class NoteField(
+data class NoteFieldDto(
 
     @field:Schema(example = "createdAt", description = "Название поля")
     @get:JsonProperty("name") val name: String? = null,
@@ -21,10 +21,9 @@ data class NoteField(
     @get:JsonProperty("type") val type: Type? = null,
 
     @field:Valid
-    @field:Schema(example = "null", description = "")
-    @get:JsonProperty("value") val `value`: NoteFieldValue? = null
+    @field:Schema(example = "null", description = "Поле может быть не заполнено")
+    @get:JsonProperty("value") val value: Any? = null
 ) {
-
     /**
      * Тип значения поля
      * Values: string,number,boolean,date,list
@@ -34,17 +33,17 @@ data class NoteField(
         STRING("string"),
         NUMBER("number"),
         BOOLEAN("boolean"),
-        DATE("date"),
         LIST("list");
 
         companion object {
+            private val VALUE_MAP: Map<String, Type> = Type.entries.associateBy { it.value }
+
             @JvmStatic
             @JsonCreator
             fun forValue(value: String): Type {
-                return Type.entries.firstOrNull { it.value == value }
-                    ?: throw IllegalArgumentException("Unexpected value '$value' for enum 'NoteField'")
+                return VALUE_MAP[value]
+                    ?: throw IllegalArgumentException("Unexpected value '$value' for enum 'NoteField.Type'")
             }
         }
     }
 }
-

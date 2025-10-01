@@ -9,7 +9,7 @@ paths:
     get:
       summary: Получить заметку по идентификатору
       description: >
-        Идентификатор (`id`) вычисляется как **MD5-хеш** от полного пути заметки внутри Obsidian-хранилища.
+        Идентификатор (`id`) вычисляется как **MD5-хеш** от полного пути заметки (без расширения) внутри Obsidian-хранилища.
       parameters:
         - name: id
           in: path
@@ -33,9 +33,9 @@ paths:
                     path: "Projects/Obsidian/ExampleNote.md"
                     title: "ExampleNote"
                     fields:
-                      - name: "createdAt"
-                        type: "date"
-                        value: "2025-09-20T12:34:56Z"
+                      - name: "done"
+                        type: "boolean"
+                        value: true
                       - name: "tags"
                         type: "list"
                         value: [ "obsidian", "api" ]
@@ -69,47 +69,17 @@ paths:
 
 components:
   schemas:
-    NoteField:
-      type: object
-      description: Поле заметки
-      properties:
-        name:
-          type: string
-          description: Название поля
-          example: "createdAt"
-        type:
-          type: string
-          enum: [ string, number, boolean, date, list ]
-          description: Тип значения поля
-          example: "date"
-        value:
-          description: Значение поля (тип зависит от поля)
-          oneOf:
-            - type: string
-              example: "Задача"
-            - type: number
-              example: 42
-            - type: boolean
-              example: true
-            - type: string
-              format: date-time
-              example: "2025-09-20T12:34:56Z"
-            - type: array
-              items:
-                type: string
-              example: [ "tag1", "tag2" ]
-
     Note:
       type: object
       description: Заметка Obsidian
       properties:
         id:
           type: string
-          description: MD5-хеш полного пути заметки
+          description: MD5-хеш полного пути заметки (без расширения)
           example: "5d41402abc4b2a76b9719d911017c592"
         path:
           type: string
-          description: Полный путь к заметке в хранилище
+          description: Полный путь к заметке в хранилище (с расширением)
           example: "Projects/Obsidian/ExampleNote.md"
         title:
           type: string
@@ -124,3 +94,46 @@ components:
           type: string
           description: Markdown-содержимое заметки
           example: "# Заголовок\nТекст заметки..."
+
+    NoteField:
+      type: object
+      description: Поле заметки
+      properties:
+        name:
+          type: string
+          description: Название поля
+          example: "createdAt"
+        type:
+          type: string
+          enum: [ string, number, boolean, list ]
+          description: Тип значения поля
+          example: "number"
+        value:
+          description: Значение поля (тип зависит от поля)
+          oneOf:
+            - $ref: '#/components/schemas/NoteFieldString'
+            - $ref: '#/components/schemas/NoteFieldNumber'
+            - $ref: '#/components/schemas/NoteFieldBoolean'
+            - $ref: '#/components/schemas/NoteFieldList'
+
+    NoteFieldString:
+      type: string
+      description: Значение строкового поля
+      example: "Задача"
+
+    NoteFieldNumber:
+      type: number
+      description: Значение числового поля
+      example: 42
+
+    NoteFieldBoolean:
+      type: boolean
+      description: Значение логического поля
+      example: true
+
+    NoteFieldList:
+      type: array
+      description: Значение поля в виде списка строк
+      items:
+        type: string
+      example: [ "tag1", "tag2" ]
