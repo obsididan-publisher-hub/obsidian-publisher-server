@@ -11,7 +11,7 @@ import java.io.File
  * @author fenya
  * @since 2025.09.21
  */
-class GraphBuilder(private val vaultPath: String) {
+class GraphBuilder(private val vaultPath: String, private val ignoredDirectories: List<String>) {
 
     private val logger: Logger = LoggerFactory.getLogger(GraphBuilder::class.java)
 
@@ -24,22 +24,23 @@ class GraphBuilder(private val vaultPath: String) {
         require(root.exists()) { "vault directory $vaultPath is not exist" }
         logger.info("Start processing vault $vaultPath")
         root.walkTopDown()
-            .onEnter { !it.isHidden } // Не заходим в скрытые директории
+            .onEnter { !it.isHidden && !(ignoredDirectories.contains(it.name)) }
             .filter { it.isFile && it.extension == NOTE_EXTENSION } // Оставляем только md-файлы
             .forEach { file ->
                 try {
-                    val fullName = file.relativeTo(root).path
+                    val fullName: String = file.relativeTo(root).path
                     logger.info("processing $fullName")
-                    val noteId = NoteUtils.calculateNoteId(fullName.substringBeforeLast('.'))
+                    val noteId = NoteUtils.calculateResourceId(fullName.substringBeforeLast('.'))
 
-                    val extractedLinks: Set<NoteLink> = NoteUtils.extractLinks(file.readText())
+                    val extractedLinks: Set<Link> = NoteUtils.extractLinks(file.readText())
                         .associateBy { it.path }
                         .values
                         .toSet()
 
-                    val outgoingLinks: MutableSet<String> = extractedLinks
-                        .map { link -> NoteUtils.calculateNoteId(link.path) } // считаем id
-                        .toMutableSet()
+                    val outgoingLinks: Set<String> = extractedLinks
+                        .filter { it.extension == NOTE_EXTENSION }
+                        .map { link -> NoteUtils.calculateResourceId(link.path) }
+                        .toSet()
 
                     val note = Note(
                         id = noteId,

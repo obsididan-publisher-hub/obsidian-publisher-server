@@ -23,11 +23,11 @@ class ExtractLinksTest {
         val links = NoteUtils.extractLinks(text)
 
         val expected = setOf(
-            NoteLink("[[note2]]", "note2", null, null),
-            NoteLink("[[note2|alias]]", "note2", null, "alias"),
-            NoteLink("[[note2#title]]", "note2", "title", null),
-            NoteLink("[[note2#title|aliasOnTitle]]", "note2", "title", "aliasOnTitle"),
-            NoteLink("[[note2.md]]", "note2.md", null, null)
+            Link("[[note2]]", "note2", null, null),
+            Link("[[note2|alias]]", "note2", null, "alias"),
+            Link("[[note2#title]]", "note2", "title", null),
+            Link("[[note2#title|aliasOnTitle]]", "note2", "title", "aliasOnTitle"),
+            Link("[[note2.md]]", "note2.md", null, null)
         )
 
         assertEquals(expected, links)
@@ -44,9 +44,9 @@ class ExtractLinksTest {
         val links = NoteUtils.extractLinks(text)
 
         val expected = setOf(
-            NoteLink("[[dir1/note3|note3]]", "dir1/note3", null, "note3"),
-            NoteLink("[[dir2/note3|note3]]", "dir2/note3", null, "note3"),
-            NoteLink("[[note3]]", "note3", null, null)
+            Link("[[dir1/note3|note3]]", "dir1/note3", null, "note3"),
+            Link("[[dir2/note3|note3]]", "dir2/note3", null, "note3"),
+            Link("[[note3]]", "note3", null, null)
         )
 
         assertEquals(expected, links)

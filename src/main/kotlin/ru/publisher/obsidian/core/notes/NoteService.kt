@@ -13,4 +13,9 @@ interface NoteService {
      * @return заметка с переданным идентификатором
      */
     fun getNoteById(noteId: String): Note
+
+    /**
+     * @return все заметки в хранилище
+     */
+    fun getAllNotes(): Set<Note>
 }

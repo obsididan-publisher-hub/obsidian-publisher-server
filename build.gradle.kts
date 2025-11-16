@@ -22,6 +22,7 @@ repositories {
 
 val springdocVersion = "2.8.13"
 val jacksonYamlVersion = "2.20.0"
+val flexmarkVersion = "0.64.8"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
@@ -31,6 +32,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonYamlVersion")
+    implementation("com.vladsch.flexmark:flexmark-all:$flexmarkVersion")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

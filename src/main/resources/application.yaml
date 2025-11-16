@@ -11,7 +11,14 @@ obsidian:
     path: /home/fenya/obsidian/obsidian
 
 notes:
+  ignored:
+    directories:
+      - templates
   startNote: "index"
+  htmlConverted:
+    path: "${user.dir}/html"
+  attachments:
+    path: "${user.dir}/attachments"
 
 management:
   endpoints:

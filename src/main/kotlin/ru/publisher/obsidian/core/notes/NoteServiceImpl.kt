@@ -24,4 +24,6 @@ class NoteServiceImpl(
         notesGraph.getOrElse(noteId) {
             throw NoteNotExistException("Note '$noteId' not found.")
         }
+
+    override fun getAllNotes(): Set<Note> = notesGraph.values.toSet()
 }
