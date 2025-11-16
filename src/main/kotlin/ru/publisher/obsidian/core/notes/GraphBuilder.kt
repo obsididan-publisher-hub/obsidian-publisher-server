@@ -11,7 +11,7 @@ import java.io.File
  * @author fenya
  * @since 2025.09.21
  */
-class GraphBuilder(private val vaultPath: String) {
+class GraphBuilder(private val vaultPath: String, private val ignoredDirectories: List<String>) {
 
     private val logger: Logger = LoggerFactory.getLogger(GraphBuilder::class.java)
 
@@ -24,7 +24,7 @@ class GraphBuilder(private val vaultPath: String) {
         require(root.exists()) { "vault directory $vaultPath is not exist" }
         logger.info("Start processing vault $vaultPath")
         root.walkTopDown()
-            .onEnter { !it.isHidden } // Не заходим в скрытые директории
+            .onEnter { !it.isHidden && !(ignoredDirectories.contains(it.name)) }
             .filter { it.isFile && it.extension == NOTE_EXTENSION } // Оставляем только md-файлы
             .forEach { file ->
                 try {

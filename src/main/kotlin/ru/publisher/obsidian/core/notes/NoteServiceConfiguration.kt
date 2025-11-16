@@ -3,6 +3,7 @@ package ru.publisher.obsidian.core.notes
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import ru.publisher.obsidian.html.IgnoredDirectories
 
 /**
  * Конфигурация [NoteService]. По переданному в пути в *obsidian.vault.path* строит граф
@@ -16,6 +17,12 @@ class NoteServiceConfiguration(
      * @return готовый к работе сервис
      */
     @Bean
-    fun noteService(@Value("\${notes.startNote}") startNoteName: String): NoteService =
-        NoteServiceImpl(GraphBuilder(vaultPath).build(), NoteUtils.calculateNoteId(startNoteName))
+    fun noteService(
+        @Value("\${notes.startNote}") startNoteName: String,
+        ignoredDirectories: IgnoredDirectories
+    ): NoteService =
+        NoteServiceImpl(
+            GraphBuilder(vaultPath, ignoredDirectories.directories).build(),
+            NoteUtils.calculateNoteId(startNoteName)
+        )
 }
