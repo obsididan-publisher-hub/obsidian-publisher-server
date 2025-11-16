@@ -11,11 +11,17 @@ const val NOTE_EXTENSION = "md"
  * @fenya
  * @since 2025.09.20
  */
-class NoteServiceImpl(private var notesGraph: Map<String, Note>) : NoteService {
+class NoteServiceImpl(
+    private val notesGraph: Map<String, Note>,
+    private val startNoteId: String,
+) : NoteService {
 
-    override fun getNoteById(noteId: String): Note {
-        return notesGraph.getOrElse(noteId) {
+    override fun getStartNote(): Note {
+        return getNoteById(startNoteId)
+    }
+
+    override fun getNoteById(noteId: String): Note =
+        notesGraph.getOrElse(noteId) {
             throw NoteNotExistException("Note '$noteId' not found.")
         }
-    }
 }

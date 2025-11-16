@@ -5,6 +5,28 @@ info:
   description: API для работы с Obsidian заметками
 
 paths:
+  /:
+    options:
+      summary: Получить информацию об API
+      description: Возвращает базовую информацию об API и стартовой заметке
+      responses:
+        "200":
+          description: Информация успешно получена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptionsResponse"
+  /options:
+    get:
+      summary: Получить информацию об API
+      description: Возвращает базовую информацию API и стартовой заметке
+      responses:
+        "200":
+          description: Информация успешно получена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptionsResponse"
   /notes/{id}:
     get:
       summary: Получить заметку по идентификатору
@@ -25,29 +47,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Note"
-              examples:
-                sample:
-                  summary: Пример заметки
-                  value:
-                    id: "5d41402abc4b2a76b9719d911017c592"
-                    path: "Projects/Obsidian/ExampleNote.md"
-                    title: "ExampleNote"
-                    fields:
-                      - name: "done"
-                        type: "boolean"
-                        value: true
-                      - name: "tags"
-                        type: "list"
-                        value: [ "obsidian", "api" ]
-                      - name: "priority"
-                        type: "number"
-                        value: 3
-                    content: |
-                      # Заголовок
-                      Текст заметки с **Markdown** форматированием.
         "404":
           description: Заметка не найдена
-
   /tags:
     get:
       summary: Получить все теги
@@ -66,9 +67,20 @@ paths:
                 sample:
                   summary: Пример списка тегов
                   value: [ "obsidian", "api", "note" ]
-
 components:
   schemas:
+    OptionsResponse:
+      type: object
+      description:
+      properties:
+        basePath:
+          type: string
+          description: Глобальный префикс для всех api методов
+          example: "/api"
+        startNoteId:
+          type: string
+          description: MD5-хеш стартовой заметки
+          example: "5d41402abc4b2a76b9719d911017c592"
     Note:
       type: object
       description: Заметка Obsidian

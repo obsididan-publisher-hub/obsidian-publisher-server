@@ -30,6 +30,4 @@ data class NoteDto(
 
     @field:Schema(example = "# ЗаголовокТекст заметки...", description = "Markdown-содержимое заметки")
     @get:JsonProperty("content") val content: String
-) {
-
-}
+)
