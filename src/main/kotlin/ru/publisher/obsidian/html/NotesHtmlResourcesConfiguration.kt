@@ -5,22 +5,29 @@ import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.data.MutableDataSet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import ru.publisher.obsidian.attachments.AttachmentExtension
 import ru.publisher.obsidian.core.contents.NoteContentService
+import ru.publisher.obsidian.core.notes.NOTE_EXTENSION
 import ru.publisher.obsidian.core.notes.Note
 import ru.publisher.obsidian.core.notes.NoteService
+import ru.publisher.obsidian.core.notes.NoteUtils
+import ru.publisher.obsidian.core.notes.NoteUtils.Companion.NOTE_LINK_REGEX
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+
 
 @Configuration
 class NotesHtmlResourcesConfiguration {
 
-    private val LOG: Logger = LoggerFactory.getLogger(Companion::class.java)
+    private val LOG: Logger = LoggerFactory.getLogger(NotesHtmlResourcesConfiguration::class.java)
 
     companion object {
-        const val HTML_RESOURCES_BEAN = "notesHtmlResources"
+        const val HTML_RESOURCES = "notesHtmlResources"
 
         private const val HTML_TEMPLATE = """
             <!DOCTYPE html>
@@ -51,44 +58,112 @@ class NotesHtmlResourcesConfiguration {
             %s
             </body>
             </html>
-            """
+        """
     }
 
-    @Bean(HTML_RESOURCES_BEAN)
-    fun notesHtmlResources(
-        noteService: NoteService,
-        noteContentService: NoteContentService,
-        @Value("\${notes.htmlConverted.path}") resourcesPath: String
-    ): Map<Note, Path> {
+    @Value("\${obsidian.vault.path}")
+    lateinit var vaultPath: String
+
+    @Value("\${notes.htmlConverted.path}")
+    lateinit var resourcesPath: String
+
+    @Autowired
+    lateinit var noteService: NoteService
+
+    @Autowired
+    lateinit var noteContentService: NoteContentService
+
+    @Bean(HTML_RESOURCES)
+    fun htmlNotesViews(): Map<Note, Path> {
+        LOG.info("htmlNotesViews() bean called") // breakpoint сюда точно сработает
+
+        val root = File(vaultPath)
+        require(root.exists()) { "Vault directory $vaultPath does not exist" }
+
         val resourcesDir = Path.of(resourcesPath)
-        if (!Files.exists(resourcesDir)) {
-            Files.createDirectories(resourcesDir)
-        }
+        if (!Files.exists(resourcesDir)) Files.createDirectories(resourcesDir)
 
         val markdownParser: Parser = createParser()
         val renderer: HtmlRenderer = HtmlRenderer.builder().build()
 
-        return noteService.getAllNotes()
-            .asSequence()
-            .associateWith { note ->
-                LOG.info("processing {}", note.fullName)
-                val (_, body: String) = noteContentService.getContent(note)
-                val file = resourcesDir.resolve("${note.id}.html")
-                val document = markdownParser.parse(body)
-                val htmlBody: String = renderer.render(document)
+        val notesMap = HashMap<Note, Path>()
 
-                // Собираем полный HTML с шаблоном
-                val html = String.format(HTML_TEMPLATE, note.fullName, htmlBody)
-                Files.writeString(file, html)
+        root.walkTopDown()
+            .onEnter { !it.isHidden }
+            .filter { it.isFile && it.extension == NOTE_EXTENSION }
+            .forEach { file ->
+                try {
+                    val fullName = file.relativeTo(root).path
+                    LOG.info("Converting note: $fullName")
+
+                    val noteId = NoteUtils.calculateResourceId(fullName.substringBeforeLast('.'))
+                    val note: Note = noteService.getNoteById(noteId)
+                    val (_, body) = noteContentService.getContent(note)
+
+                    val processedBody = replaceLinks(body)
+                    val document = markdownParser.parse(processedBody)
+                    val htmlBody = renderer.render(document)
+
+                    val html = String.format(HTML_TEMPLATE, fullName, htmlBody)
+                    val outputFile = resourcesDir.resolve("$noteId.html")
+                    Files.writeString(outputFile, html)
+
+                    notesMap[note] = outputFile
+                } catch (e: Exception) {
+                    LOG.error("Failed to process note: ${file.absolutePath}", e)
+                }
             }
-            .toMap()
+
+        LOG.info("Vault processing ended. ${notesMap.size} notes processed.")
+        return notesMap
+    }
+
+    private fun replaceLinks(markdown: String): String {
+        return NOTE_LINK_REGEX.replace(markdown) { match ->
+            val path = match.groupValues[1].trim()
+            val section = match.groupValues.getOrNull(2)?.takeIf { it.isNotEmpty() }
+            val alias = match.groupValues.getOrNull(3)?.takeIf { it.isNotEmpty() }
+
+            val extension = path.substringAfterLast('.', "")
+            val isNote =
+                extension == NOTE_EXTENSION || extension.isEmpty() || AttachmentExtension.fromExtension(extension) == null
+
+            var id: String? = null
+            if (isNote) {
+                val pathWithExtension = path + "." + NOTE_EXTENSION
+                var foundNote: Note? = noteService.getAllNotes().find { it.fullName == pathWithExtension }
+
+                if (foundNote == null) {
+                    foundNote = noteService.getAllNotes().find { it.fullName.endsWith(pathWithExtension) }
+                }
+
+                if (foundNote != null) {
+                    id = foundNote.id
+                } else {
+                    LOG.warn("Note not found for link: '{}'", path)
+                }
+            } else {
+                id = NoteUtils.calculateResourceId(path)
+            }
+
+            val label = alias ?: path.substringBeforeLast('.')
+
+            val href = when {
+                id != null && isNote -> "/notes/$id" + (section?.let { "#$it" } ?: "")
+                AttachmentExtension.fromExtension(extension) != null -> "/attachments/$id"
+                else -> null
+            }
+
+            when {
+                isNote && href != null -> "[$label]($href)"
+                AttachmentExtension.fromExtension(extension) != null && href != null -> "![${label}]($href)"
+                else -> match.value
+            }
+        }
     }
 
     private fun createParser(): Parser {
         val options = MutableDataSet()
-        //options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), StrikethroughExtension.create()));
-        // uncomment to convert soft-breaks to hard breaks
-        //options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
         return Parser.builder(options).build()
     }
 }

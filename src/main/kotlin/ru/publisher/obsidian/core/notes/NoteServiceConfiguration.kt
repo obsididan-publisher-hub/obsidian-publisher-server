@@ -10,19 +10,18 @@ import ru.publisher.obsidian.html.IgnoredDirectories
  * заметок и на его основе инициализирует сервис
  */
 @Configuration
-class NoteServiceConfiguration(
-    @Value("\${obsidian.vault.path}") private val vaultPath: String
-) {
+class NoteServiceConfiguration {
     /**
      * @return готовый к работе сервис
      */
     @Bean
     fun noteService(
         @Value("\${notes.startNote}") startNoteName: String,
+        @Value("\${obsidian.vault.path}") vaultPath: String,
         ignoredDirectories: IgnoredDirectories
     ): NoteService =
         NoteServiceImpl(
             GraphBuilder(vaultPath, ignoredDirectories.directories).build(),
-            NoteUtils.calculateNoteId(startNoteName)
+            NoteUtils.calculateResourceId(startNoteName)
         )
 }

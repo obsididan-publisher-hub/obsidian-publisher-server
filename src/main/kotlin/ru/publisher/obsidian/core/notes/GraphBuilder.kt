@@ -30,7 +30,7 @@ class GraphBuilder(private val vaultPath: String, private val ignoredDirectories
                 try {
                     val fullName: String = file.relativeTo(root).path
                     logger.info("processing $fullName")
-                    val noteId = NoteUtils.calculateNoteId(fullName.substringBeforeLast('.'))
+                    val noteId = NoteUtils.calculateResourceId(fullName.substringBeforeLast('.'))
 
                     val extractedLinks: Set<Link> = NoteUtils.extractLinks(file.readText())
                         .associateBy { it.path }
@@ -39,7 +39,7 @@ class GraphBuilder(private val vaultPath: String, private val ignoredDirectories
 
                     val outgoingLinks: Set<String> = extractedLinks
                         .filter { it.extension == NOTE_EXTENSION }
-                        .map { link -> NoteUtils.calculateNoteId(link.path) }
+                        .map { link -> NoteUtils.calculateResourceId(link.path) }
                         .toSet()
 
                     val note = Note(

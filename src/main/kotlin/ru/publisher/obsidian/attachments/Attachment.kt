@@ -1,7 +1,10 @@
 package ru.publisher.obsidian.attachments
 
-import jakarta.validation.Path
+import java.nio.file.Path
 
-data class Attachment(val attachmentId: String, val path: Path) {
 
-}
+data class Attachment(
+    val attachmentId: String,
+    val path: Path,
+    val extension: AttachmentExtension
+)
