@@ -3,7 +3,7 @@ package ru.publisher.obsidian.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Valid
-import ru.publisher.obsidian.model.NoteField
+import ru.publisher.obsidian.model.NoteFieldDto
 
 /**
  * Заметка Obsidian
@@ -13,7 +13,7 @@ import ru.publisher.obsidian.model.NoteField
  * @param fields Список полей заметки
  * @param content Markdown-содержимое заметки
  */
-data class Note(
+data class NoteDto(
 
     @field:Schema(example = "5d41402abc4b2a76b9719d911017c592", description = "MD5-хеш полного пути заметки")
     @get:JsonProperty("id") val id: String,
@@ -26,7 +26,7 @@ data class Note(
 
     @field:Valid
     @field:Schema(example = "[]", description = "Список полей заметки")
-    @get:JsonProperty("fields") val fields: List<NoteField>,
+    @get:JsonProperty("fields") val fields: List<NoteFieldDto>,
 
     @field:Schema(example = "# ЗаголовокТекст заметки...", description = "Markdown-содержимое заметки")
     @get:JsonProperty("content") val content: String

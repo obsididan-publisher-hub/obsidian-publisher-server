@@ -8,7 +8,7 @@ private const val TEST_VAULT1_NAME = "graphBuilderTest"
 private const val TEST_VAULT2_NAME = "graphBuilderTestDirs"
 
 /**
- * Тесты на метод [GraphBuilder.build]
+ * Тесты для [GraphBuilder]
  */
 class GraphBuilderTest {
 
