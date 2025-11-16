@@ -24,14 +24,14 @@ class NoteUtils {
          * @param content содержимое заметки
          * @return список ссылок на странице
          */
-        fun extractLinks(content: String): Set<NoteLink> {
+        fun extractLinks(content: String): Set<Link> {
             return NOTE_LINK_REGEX.findAll(content).map { match ->
-                val original = match.value
-                val path = match.groupValues[1].trim()
+                val original: String = match.value
+                val path: String = match.groupValues[1].trim()
+                val extension: String = path.substringAfterLast('.', NOTE_EXTENSION)
                 val section = match.groupValues.getOrNull(2)?.takeIf { it.isNotEmpty() }
                 val alias = match.groupValues.getOrNull(3)?.takeIf { it.isNotEmpty() }
-
-                NoteLink(original, path, section, alias)
+                Link(original, path, extension, section, alias)
             }.toSet()
         }
 

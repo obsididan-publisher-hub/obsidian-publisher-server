@@ -28,18 +28,19 @@ class GraphBuilder(private val vaultPath: String) {
             .filter { it.isFile && it.extension == NOTE_EXTENSION } // Оставляем только md-файлы
             .forEach { file ->
                 try {
-                    val fullName = file.relativeTo(root).path
+                    val fullName: String = file.relativeTo(root).path
                     logger.info("processing $fullName")
                     val noteId = NoteUtils.calculateNoteId(fullName.substringBeforeLast('.'))
 
-                    val extractedLinks: Set<NoteLink> = NoteUtils.extractLinks(file.readText())
+                    val extractedLinks: Set<Link> = NoteUtils.extractLinks(file.readText())
                         .associateBy { it.path }
                         .values
                         .toSet()
 
-                    val outgoingLinks: MutableSet<String> = extractedLinks
-                        .map { link -> NoteUtils.calculateNoteId(link.path) } // считаем id
-                        .toMutableSet()
+                    val outgoingLinks: Set<String> = extractedLinks
+                        .filter { it.extension == NOTE_EXTENSION }
+                        .map { link -> NoteUtils.calculateNoteId(link.path) }
+                        .toSet()
 
                     val note = Note(
                         id = noteId,

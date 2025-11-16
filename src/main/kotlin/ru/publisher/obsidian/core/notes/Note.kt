@@ -14,6 +14,6 @@ package ru.publisher.obsidian.core.notes
 data class Note(
     val id: String,
     val fullName: String,
-    val outgoingNotes: MutableSet<String>,
+    val outgoingNotes: Set<String>,
     val incomingNotes: MutableSet<String>
 )

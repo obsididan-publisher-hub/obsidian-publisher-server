@@ -12,6 +12,8 @@ obsidian:
 
 notes:
   startNote: "index"
+  htmlConverted:
+    path: "${user.dir}/html"
 
 management:
   endpoints:
