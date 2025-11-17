@@ -7,5 +7,7 @@ interface AttachmentService {
     /**
      * @param attachemntId идентификатор заметки
      */
-    fun getAttachment(attachemntId: String): Attachment
+    fun getAttachment(attachemntId: String): Attachment?
+
+    fun getAllAttachments(): Set<Attachment>
 }

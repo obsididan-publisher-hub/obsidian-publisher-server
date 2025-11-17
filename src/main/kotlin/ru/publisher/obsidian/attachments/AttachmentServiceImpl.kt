@@ -9,7 +9,8 @@ class AttachmentServiceImpl(
     /**
      * @param attachemntId идентификатор заметки
      */
-    override fun getAttachment(attachemntId: String): Attachment {
-        TODO("Not yet implemented")
-    }
+    override fun getAttachment(attachemntId: String): Attachment? =
+        attachmentResources.get(attachemntId)
+
+    override fun getAllAttachments(): Set<Attachment> = attachmentResources.values.toSet()
 }

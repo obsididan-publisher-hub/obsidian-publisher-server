@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import ru.publisher.obsidian.attachments.Attachment
 import ru.publisher.obsidian.attachments.AttachmentExtension
+import ru.publisher.obsidian.attachments.AttachmentService
 import ru.publisher.obsidian.core.contents.NoteContentService
 import ru.publisher.obsidian.core.notes.NOTE_EXTENSION
 import ru.publisher.obsidian.core.notes.Note
@@ -55,6 +57,7 @@ class NotesHtmlResourcesConfiguration {
                 </style>
             </head>
             <body>
+            <h1>%s</h1>
             %s
             </body>
             </html>
@@ -72,6 +75,9 @@ class NotesHtmlResourcesConfiguration {
 
     @Autowired
     lateinit var noteContentService: NoteContentService
+
+    @Autowired
+    lateinit var attachmentService: AttachmentService
 
     @Bean(HTML_RESOURCES)
     fun htmlNotesViews(): Map<Note, Path> {
@@ -104,7 +110,7 @@ class NotesHtmlResourcesConfiguration {
                     val document = markdownParser.parse(processedBody)
                     val htmlBody = renderer.render(document)
 
-                    val html = String.format(HTML_TEMPLATE, fullName, htmlBody)
+                    val html = String.format(HTML_TEMPLATE, fullName, note.fullName, htmlBody)
                     val outputFile = resourcesDir.resolve("$noteId.html")
                     Files.writeString(outputFile, html)
 
@@ -143,7 +149,16 @@ class NotesHtmlResourcesConfiguration {
                     LOG.warn("Note not found for link: '{}'", path)
                 }
             } else {
-                id = NoteUtils.calculateResourceId(path)
+                var foundAttachment: Attachment? = attachmentService.getAllAttachments().find { it.fullName == path }
+                if (foundAttachment == null) {
+                    foundAttachment = attachmentService.getAllAttachments().find { it.fullName.endsWith(path) }
+                }
+                if (foundAttachment != null) {
+                    id = foundAttachment.attachmentId
+                } else {
+                    id = path
+                    LOG.warn("Attachment not found for link: '{}'", path)
+                }
             }
 
             val label = alias ?: path.substringBeforeLast('.')

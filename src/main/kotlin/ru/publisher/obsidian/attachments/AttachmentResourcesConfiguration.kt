@@ -35,26 +35,27 @@ class AttachmentResourcesConfiguration(
         root.walkTopDown()
             .onEnter { !it.isHidden }
             .filter { it.isFile }
-            .forEach { file ->
-                val ext = AttachmentExtension.fromExtension(file.extension) ?: return@forEach
+            .forEach {
+                val ext = AttachmentExtension.fromExtension(it.extension) ?: return@forEach
                 try {
-                    logger.info("Copying attachment: ${file.path}")
-                    val fullName = file.relativeTo(root).path
+                    logger.info("Copying attachment: ${it.path}")
+                    val fullName = it.relativeTo(root).path
                     val attachmentId = NoteUtils.calculateResourceId(fullName)
                     val newFileName = "$attachmentId.${ext.extentionStr}"
                     val targetPath = targetDir.toPath().resolve(newFileName)
                     Files.copy(
-                        file.toPath(),
+                        it.toPath(),
                         targetPath,
                         StandardCopyOption.REPLACE_EXISTING
                     )
                     attachments[attachmentId] = Attachment(
                         attachmentId = attachmentId,
+                        fullName = fullName,
                         path = targetPath,
                         extension = ext
                     )
                 } catch (e: Exception) {
-                    logger.error("Failed to process attachment file: ${file.absolutePath}", e)
+                    logger.error("Failed to process attachment file: ${it.absolutePath}", e)
                 }
             }
         return attachments.toMap()

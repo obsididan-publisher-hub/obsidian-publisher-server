@@ -51,7 +51,7 @@ class HtmlResourcesController(
     fun getAttachment(@PathVariable id: String): ResponseEntity<ByteArray> {
         val attachment: Attachment = attachments[id] ?: return ResponseEntity.notFound().build()
         val bytes = Files.readAllBytes(attachment.path)
-        val mediaType = MediaType.parseMediaType(attachment.extension.extentionStr) // например "image/png"
+        val mediaType = MediaType.parseMediaType("image/" + attachment.extension.extentionStr) // например "image/png"
         return ResponseEntity.ok()
             .contentType(mediaType)
             .body(bytes)
