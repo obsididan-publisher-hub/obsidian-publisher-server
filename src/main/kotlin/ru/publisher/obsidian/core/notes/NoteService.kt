@@ -5,6 +5,11 @@ package ru.publisher.obsidian.core.notes
  */
 interface NoteService {
     /**
+     * @return стартовая заметка
+     */
+    fun getStartNote(): Note
+
+    /**
      * @return заметка с переданным идентификатором
      */
     fun getNoteById(noteId: String): Note
