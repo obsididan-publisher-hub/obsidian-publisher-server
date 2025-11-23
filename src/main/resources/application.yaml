@@ -14,7 +14,7 @@ notes:
   ignored:
     directories:
       - templates
-  startNote: "index"
+  startNote: "index.md"
   htmlConverted:
     path: "${user.dir}/html"
   attachments:

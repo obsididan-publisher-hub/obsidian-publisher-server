@@ -1,5 +1,8 @@
 package ru.publisher.obsidian.core.notes
 
+import kotlin.io.path.Path
+import kotlin.io.path.name
+
 /**
  * Расширение файла заметки
  */
@@ -26,4 +29,6 @@ class NoteServiceImpl(
         }
 
     override fun getAllNotes(): Set<Note> = notesGraph.values.toSet()
+
+    override fun getNoteName(note: Note): String = Path(note.fullName).name.substringBeforeLast('.')
 }

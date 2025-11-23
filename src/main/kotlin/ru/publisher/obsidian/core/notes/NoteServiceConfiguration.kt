@@ -21,7 +21,7 @@ class NoteServiceConfiguration {
         ignoredDirectories: IgnoredDirectories
     ): NoteService =
         NoteServiceImpl(
-            GraphBuilder(vaultPath, ignoredDirectories.directories).build(),
+            NotesCollector(vaultPath, ignoredDirectories.directories).collect(),
             NoteUtils.calculateResourceId(startNoteName)
         )
 }

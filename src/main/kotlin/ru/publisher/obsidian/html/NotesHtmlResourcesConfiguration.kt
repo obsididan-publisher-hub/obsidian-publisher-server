@@ -16,9 +16,7 @@ import ru.publisher.obsidian.core.contents.NoteContentService
 import ru.publisher.obsidian.core.notes.NOTE_EXTENSION
 import ru.publisher.obsidian.core.notes.Note
 import ru.publisher.obsidian.core.notes.NoteService
-import ru.publisher.obsidian.core.notes.NoteUtils
 import ru.publisher.obsidian.core.notes.NoteUtils.Companion.NOTE_LINK_REGEX
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -81,11 +79,6 @@ class NotesHtmlResourcesConfiguration {
 
     @Bean(HTML_RESOURCES)
     fun htmlNotesViews(): Map<Note, Path> {
-        LOG.info("htmlNotesViews() bean called") // breakpoint сюда точно сработает
-
-        val root = File(vaultPath)
-        require(root.exists()) { "Vault directory $vaultPath does not exist" }
-
         val resourcesDir = Path.of(resourcesPath)
         if (!Files.exists(resourcesDir)) Files.createDirectories(resourcesDir)
 
@@ -94,86 +87,90 @@ class NotesHtmlResourcesConfiguration {
 
         val notesMap = HashMap<Note, Path>()
 
-        root.walkTopDown()
-            .onEnter { !it.isHidden }
-            .filter { it.isFile && it.extension == NOTE_EXTENSION }
-            .forEach { file ->
-                try {
-                    val fullName = file.relativeTo(root).path
-                    LOG.info("Converting note: $fullName")
+        noteService.getAllNotes().forEach {
+            val (_, body) = noteContentService.getContent(it)
+            val noteName: String = noteService.getNoteName(it)
+            val processedBody = replaceLinks(it, body)
+            val document = markdownParser.parse(processedBody)
+            val htmlBody = renderer.render(document)
+            val html = String.format(HTML_TEMPLATE, noteName, noteName, htmlBody)
+            val outputFile = resourcesDir.resolve("${it.id}.html")
+            Files.writeString(outputFile, html)
+            notesMap[it] = outputFile
+        }
 
-                    val noteId = NoteUtils.calculateResourceId(fullName.substringBeforeLast('.'))
-                    val note: Note = noteService.getNoteById(noteId)
-                    val (_, body) = noteContentService.getContent(note)
-
-                    val processedBody = replaceLinks(body)
-                    val document = markdownParser.parse(processedBody)
-                    val htmlBody = renderer.render(document)
-
-                    val html = String.format(HTML_TEMPLATE, fullName, note.fullName, htmlBody)
-                    val outputFile = resourcesDir.resolve("$noteId.html")
-                    Files.writeString(outputFile, html)
-
-                    notesMap[note] = outputFile
-                } catch (e: Exception) {
-                    LOG.error("Failed to process note: ${file.absolutePath}", e)
-                }
-            }
-
-        LOG.info("Vault processing ended. ${notesMap.size} notes processed.")
+        LOG.info("Html converting ended. ${notesMap.size} notes converted.")
         return notesMap
     }
 
-    private fun replaceLinks(markdown: String): String {
+    /**
+     * Заменяет ссылки в формате вики ([[link|label]]) на markdown ссылки вида [label](link)
+     */
+    private fun replaceLinks(note: Note, markdown: String): String {
         return NOTE_LINK_REGEX.replace(markdown) { match ->
-            val path = match.groupValues[1].trim()
-            val section = match.groupValues.getOrNull(2)?.takeIf { it.isNotEmpty() }
-            val alias = match.groupValues.getOrNull(3)?.takeIf { it.isNotEmpty() }
+            val resource = match.groupValues[1].trim()
+            val section = match.groupValues[2].trim()
+            val alias = match.groupValues[3].trim()
+            if (resource.isEmpty()) // если ссылка пустая, это ссылка на текущую заметку
+            {
+                if (section.isEmpty()) {
+                    return@replace "/notes/${note.id}"
+                }
+                return@replace "/notes/${note.id}#$section"
+            }
 
-            val extension = path.substringAfterLast('.', "")
+            val extension = resource.substringAfterLast('.', "")
             val isNote =
                 extension == NOTE_EXTENSION || extension.isEmpty() || AttachmentExtension.fromExtension(extension) == null
 
-            var id: String? = null
+            var resourceId: String? = null
             if (isNote) {
-                val pathWithExtension = path + "." + NOTE_EXTENSION
-                var foundNote: Note? = noteService.getAllNotes().find { it.fullName == pathWithExtension }
 
-                if (foundNote == null) {
-                    foundNote = noteService.getAllNotes().find { it.fullName.endsWith(pathWithExtension) }
+                val pathWithExtension = if (extension.isEmpty()) {
+                    "$resource.$NOTE_EXTENSION"
+                } else {
+                    resource
                 }
 
+                val foundNote: Note? = noteService.getAllNotes().find { it.fullName.endsWith(pathWithExtension) }
                 if (foundNote != null) {
-                    id = foundNote.id
+                    resourceId = foundNote.id
                 } else {
-                    LOG.warn("Note not found for link: '{}'", path)
+                    LOG.warn("Note not found for link: '{}'", resource)
                 }
             } else {
-                var foundAttachment: Attachment? = attachmentService.getAllAttachments().find { it.fullName == path }
-                if (foundAttachment == null) {
-                    foundAttachment = attachmentService.getAllAttachments().find { it.fullName.endsWith(path) }
-                }
+                val foundAttachment: Attachment? =
+                    attachmentService.getAllAttachments().find { it.fullName.endsWith(resource) }
                 if (foundAttachment != null) {
-                    id = foundAttachment.attachmentId
+                    resourceId = foundAttachment.id
                 } else {
-                    id = path
-                    LOG.warn("Attachment not found for link: '{}'", path)
+                    resourceId = resource
+                    LOG.warn("Attachment not found for link: '{}'", resource)
                 }
             }
 
-            val label = alias ?: path.substringBeforeLast('.')
-
-            val href = when {
-                id != null && isNote -> "/notes/$id" + (section?.let { "#$it" } ?: "")
-                AttachmentExtension.fromExtension(extension) != null -> "/attachments/$id"
-                else -> null
+            val label: String = alias.ifEmpty {
+                resource
             }
 
-            when {
-                isNote && href != null -> "[$label]($href)"
-                AttachmentExtension.fromExtension(extension) != null && href != null -> "![${label}]($href)"
-                else -> match.value
-            }
+            val href =
+                if (resourceId != null && isNote) {
+                    "/notes/$resourceId" + (section?.let { "#$it" } ?: "")
+                } else if (AttachmentExtension.fromExtension(extension) != null) {
+                    "/attachments/$resourceId"
+                } else {
+                    null
+                }
+
+            val result =
+                if (isNote && href != null) {
+                    "[$label]($href)"
+                } else if (AttachmentExtension.fromExtension(extension) != null && href != null) {
+                    "![${label}]($href)"
+                } else {
+                    match.value
+                }
+            return@replace result
         }
     }
 

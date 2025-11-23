@@ -18,4 +18,6 @@ interface NoteService {
      * @return все заметки в хранилище
      */
     fun getAllNotes(): Set<Note>
+
+    fun getNoteName(note: Note): String
 }

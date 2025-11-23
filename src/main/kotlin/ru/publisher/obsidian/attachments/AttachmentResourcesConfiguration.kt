@@ -49,7 +49,7 @@ class AttachmentResourcesConfiguration(
                         StandardCopyOption.REPLACE_EXISTING
                     )
                     attachments[attachmentId] = Attachment(
-                        attachmentId = attachmentId,
+                        id = attachmentId,
                         fullName = fullName,
                         path = targetPath,
                         extension = ext

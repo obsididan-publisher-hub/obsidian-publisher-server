@@ -87,7 +87,5 @@ class NoteContentServiceImplTest {
     private fun note(fileName: String) = Note(
         id = "",
         fullName = fileName,
-        outgoingNotes = mutableSetOf(),
-        incomingNotes = mutableSetOf()
     )
 }

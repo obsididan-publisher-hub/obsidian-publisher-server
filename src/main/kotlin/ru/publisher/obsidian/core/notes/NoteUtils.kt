@@ -16,7 +16,7 @@ class NoteUtils {
          * Регулярное выражение для обнаружения ссылок в заметке obsidian
          */
         public val NOTE_LINK_REGEX =
-            Regex("""(?<!\\)\[\[([^]|#]+)(?:#([^]|]+))?(?:\|([^]]+))?]]""")
+            Regex("""(?<!\\)\[\[([^]|#]*)(?:#([^]|]+))?(?:\|([^]]+))?]]""")
 
         /**
          * Извлекает ссылки на заметки вида [[Link]] из текста заметки, не учитывая экранирование
@@ -27,11 +27,10 @@ class NoteUtils {
         fun extractLinks(content: String): Set<Link> {
             return NOTE_LINK_REGEX.findAll(content).map { match ->
                 val original: String = match.value
-                val path: String = match.groupValues[1].trim()
-                val extension: String = path.substringAfterLast('.', NOTE_EXTENSION)
+                val path: String? = match.groupValues[1].trim().ifEmpty { null }
                 val section = match.groupValues.getOrNull(2)?.takeIf { it.isNotEmpty() }
                 val alias = match.groupValues.getOrNull(3)?.takeIf { it.isNotEmpty() }
-                Link(original, path, extension, section, alias)
+                Link(original, path, section, alias)
             }.toSet()
         }
 

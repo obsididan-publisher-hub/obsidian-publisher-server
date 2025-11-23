@@ -18,6 +18,7 @@ class ExtractLinksTest {
             - [[note2#title]]
             - [[note2#title|aliasOnTitle]]
             - [[note2.md]]
+            - [[#anchor]]
         """.trimIndent()
 
         val links = NoteUtils.extractLinks(text)
@@ -27,7 +28,8 @@ class ExtractLinksTest {
             Link("[[note2|alias]]", "note2", null, "alias"),
             Link("[[note2#title]]", "note2", "title", null),
             Link("[[note2#title|aliasOnTitle]]", "note2", "title", "aliasOnTitle"),
-            Link("[[note2.md]]", "note2.md", null, null)
+            Link("[[note2.md]]", "note2.md", null, null),
+            Link("[[#anchor]]", null, "anchor", null),
         )
 
         assertEquals(expected, links)
