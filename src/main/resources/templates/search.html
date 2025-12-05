@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+</head>
+<body>
+<h2>Search results for: <span th:text="${searchString}"></span></h2>
+
+<ol>
+    <li th:each="note : ${notes}">
+        <a th:href="@{'/notes/' + ${note.id}}" th:text="${note.fullName}"></a>
+    </li>
+</ol>
+
+</body>
+</html>

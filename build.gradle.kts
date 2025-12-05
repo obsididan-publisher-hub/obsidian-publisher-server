@@ -23,6 +23,9 @@ repositories {
 val springdocVersion = "2.8.13"
 val jacksonYamlVersion = "2.20.0"
 val flexmarkVersion = "0.64.8"
+val luceneVersion = "10.3.2"
+val luceneAnalyzers = "8.11.4"
+
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
@@ -33,6 +36,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonYamlVersion")
     implementation("com.vladsch.flexmark:flexmark-all:$flexmarkVersion")
+    implementation("org.apache.lucene:lucene-core:$luceneVersion")
+    implementation("org.apache.lucene:lucene-analyzers-common:$luceneAnalyzers")
+    implementation("org.apache.lucene:lucene-queryparser:$luceneVersion")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
