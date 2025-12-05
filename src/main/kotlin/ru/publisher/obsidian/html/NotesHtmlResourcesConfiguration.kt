@@ -119,24 +119,36 @@ class NotesHtmlResourcesConfiguration {
                 return@replace "/notes/${note.id}#$section"
             }
 
+
             val extension = resource.substringAfterLast('.', "")
-            val isNote =
-                extension == NOTE_EXTENSION || extension.isEmpty() || AttachmentExtension.fromExtension(extension) == null
+            val isNote = extension == NOTE_EXTENSION
+                    || extension.isEmpty()
+                    || AttachmentExtension.fromExtension(extension) == null
 
             var resourceId: String? = null
             if (isNote) {
-
-                val pathWithExtension = if (extension.isEmpty()) {
+                val pathWithExtension = if (extension != NOTE_EXTENSION) {
                     "$resource.$NOTE_EXTENSION"
                 } else {
                     resource
                 }
 
-                val foundNote: Note? = noteService.getAllNotes().find { it.fullName.endsWith(pathWithExtension) }
-                if (foundNote != null) {
-                    resourceId = foundNote.id
-                } else {
+                val foundNotes: List<Note> =
+                    noteService.getAllNotes().asSequence().filter { it.fullName.endsWith(pathWithExtension) }.toList()
+
+                if (foundNotes.isEmpty()) {
                     LOG.warn("Note not found for link: '{}'", resource)
+                } else if (foundNotes.size == 1) {
+                    resourceId = foundNotes[0].id
+                } else {
+                    val filteredNotes =
+                        foundNotes.asSequence().filter { it.fullName.substringAfterLast("/").startsWith(resource) }
+                            .toList()
+                    if (filteredNotes.size == 1) {
+                        resourceId = foundNotes[0].id
+                    } else {
+                        LOG.warn("Note not found for link: '{}'", resource)
+                    }
                 }
             } else {
                 val foundAttachment: Attachment? =

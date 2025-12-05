@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,7 +25,7 @@ class OptionsApiController(
     @Operation(
         summary = "Получить информацию об API",
         operationId = "optionsGet",
-        description = """Возвращает базовую информацию API и стартовой заметке""",
+        description = "Возвращает базовую информацию API и стартовой заметке",
         responses = [
             ApiResponse(
                 responseCode = "200",
@@ -34,16 +35,16 @@ class OptionsApiController(
     )
     @GetMapping(
         value = ["/options"],
-        produces = ["application/json"]
+        produces = [MediaType.APPLICATION_JSON_VALUE]
     )
     fun optionsGet(): ResponseEntity<OptionsResponse> {
-        return rootOptions()
+        return getOptions()
     }
 
     @Operation(
         summary = "Получить информацию об API",
-        operationId = "rootOptions",
-        description = """Возвращает базовую информацию об API и стартовой заметке""",
+        operationId = "getOptions",
+        description = "Возвращает базовую информацию об API и стартовой заметке",
         responses = [
             ApiResponse(
                 responseCode = "200",
@@ -54,9 +55,9 @@ class OptionsApiController(
     @RequestMapping(
         method = [RequestMethod.OPTIONS],
         value = ["/"],
-        produces = ["application/json"]
+        produces = [MediaType.APPLICATION_JSON_VALUE]
     )
-    fun rootOptions(): ResponseEntity<OptionsResponse> {
+    fun getOptions(): ResponseEntity<OptionsResponse> {
         val startNote = runCatching { noteService.getStartNote() }
             .getOrElse { return ResponseEntity.notFound().build() }
         return ResponseEntity.ok(OptionsResponse(apiBasePath, startNote.id))

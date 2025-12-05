@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import ru.publisher.obsidian.core.contents.NoteContent
 import ru.publisher.obsidian.core.contents.NoteContentService
 import ru.publisher.obsidian.core.contents.frontmatter.NoteFieldType
 import ru.publisher.obsidian.core.contents.frontmatter.NoteFieldValue
@@ -43,7 +44,7 @@ class NotesApiController(
         value = ["/notes/{id}"],
         produces = ["application/json"]
     )
-    fun notesIdGet(
+    fun getById(
         @Parameter(
             description = "MD5-хеш полного пути к заметке",
             required = true
@@ -55,7 +56,7 @@ class NotesApiController(
         } catch (_: NoteNotExistException) {
             return ResponseEntity.notFound().build();
         }
-        val noteContent = contentService.getContent(note)
+        val noteContent: NoteContent = contentService.getContent(note)
         val mappedFields: List<NoteFieldDto> = noteContent.frontmatter.fields.map { field ->
             NoteFieldDto(
                 name = field.name,
